@@ -1,6 +1,8 @@
 import React, { useRef, useState } from "react";
+import * as XLSX from "xlsx";
 import {
   Upload, FileText, Check, Search, Paperclip, Pencil, Trash2, PlusCircle,
+  Download, Archive, ChevronDown,
 } from "lucide-react";
 import { T, fmt } from "./tokens";
 import { cs, SectionTitle, Field } from "./common.jsx";
@@ -69,12 +71,41 @@ function Uploader({ onExtract }) {
   );
 }
 
+function exportarExcel(gastos, nombreArchivo) {
+  const filas = gastos.map((g) => ({
+    Fecha: g.fecha,
+    Vendedor: g.vendedor,
+    Vehículo: g.vehiculo,
+    Categoría: g.categoria,
+    Subcategoría: g.subcategoria,
+    Proveedor: g.proveedor,
+    Importe: g.importe,
+    "Medio de pago": g.medio,
+    Observaciones: g.observaciones || "",
+    Comprobante: g.comp ? "Sí" : "No",
+  }));
+  const hoja = XLSX.utils.json_to_sheet(filas);
+  const libro = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(libro, hoja, "Gastos");
+  XLSX.writeFile(libro, `${nombreArchivo}.xlsx`);
+}
+
 export default function CargaGastos() {
   const [gastos, setGastos] = useState(GASTOS_INICIAL);
   const [form, setForm] = useState(emptyForm);
   const [comprobante, setComprobante] = useState(null);
   const [query, setQuery] = useState("");
   const [editId, setEditId] = useState(null);
+  const [periodosArchivados, setPeriodosArchivados] = useState([]);
+  const [confirmarCierre, setConfirmarCierre] = useState(false);
+
+  function cerrarPeriodo() {
+    const etiqueta = `Período cerrado el ${new Date().toLocaleDateString("es-AR")}`;
+    exportarExcel(gastos, `gastos_${new Date().toISOString().slice(0, 10)}`);
+    setPeriodosArchivados([{ etiqueta, gastos, cerrado: new Date().toISOString() }, ...periodosArchivados]);
+    setGastos([]);
+    setConfirmarCierre(false);
+  }
 
   function setF(key, val) { setForm({ ...form, [key]: val }); }
 
@@ -120,7 +151,27 @@ export default function CargaGastos() {
           <div style={cs.eyebrow}>REGISTRO</div>
           <div style={cs.pageTitle}>Cargar gasto</div>
         </div>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button style={cs.btnGhost} onClick={() => exportarExcel(gastos, `gastos_${new Date().toISOString().slice(0, 10)}`)}>
+            <Download size={14} style={{ marginRight: 6 }} /> Exportar a Excel
+          </button>
+          <button style={{ ...cs.btnGhost, color: T.danger, borderColor: T.dangerSoft }} onClick={() => setConfirmarCierre(true)}>
+            <Archive size={14} style={{ marginRight: 6 }} /> Cerrar período
+          </button>
+        </div>
       </div>
+
+      {confirmarCierre && (
+        <div style={{ ...cs.infoStrip, background: T.dangerSoft, alignItems: "center", justifyContent: "space-between" }}>
+          <span>
+            Esto va a descargar un Excel con los {gastos.length} gastos actuales, archivarlos, y dejar la lista vacía para empezar el próximo período. ¿Confirmás?
+          </span>
+          <div style={{ display: "flex", gap: 8, flexShrink: 0, marginLeft: 12 }}>
+            <button style={cs.btnGhost} onClick={() => setConfirmarCierre(false)}>Cancelar</button>
+            <button style={{ ...cs.btnPrimary, background: T.danger }} onClick={cerrarPeriodo}>Sí, cerrar período</button>
+          </div>
+        </div>
+      )}
 
       <div style={cs.grid}>
         {/* form column */}
@@ -205,6 +256,23 @@ export default function CargaGastos() {
           </div>
         </div>
       </div>
+
+      {periodosArchivados.length > 0 && (
+        <div style={{ ...cs.card, marginTop: 14 }}>
+          <SectionTitle eyebrow="HISTORIAL" title="Períodos cerrados anteriormente" />
+          {periodosArchivados.map((p, i) => (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${T.line}` }}>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 13 }}>{p.etiqueta}</div>
+                <div style={{ fontSize: 12, color: T.inkSoft }}>{p.gastos.length} gastos registrados</div>
+              </div>
+              <button style={cs.btnGhost} onClick={() => exportarExcel(p.gastos, `gastos_archivo_${i + 1}`)}>
+                <Download size={13} style={{ marginRight: 6 }} /> Volver a descargar
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
