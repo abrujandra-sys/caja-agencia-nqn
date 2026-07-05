@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Lock, User, Eye, EyeOff, CircleAlert } from "lucide-react";
-import { T } from "../tokens";
-import { cs } from "../common.jsx";
+import { T } from "./tokens";
+import { cs } from "./common.jsx";
 
 export const DEMO_USER = "admin";
 export const DEMO_PASS = "admin123";
