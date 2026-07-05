@@ -19,8 +19,13 @@ const GASTOS_INICIAL = [
   { id: 4, fecha: "03/07/2026", vendedor: "M. Bulacio", vehiculo: "No aplica", categoria: "Viáticos", subcategoria: "Almuerzo cliente", proveedor: "Resto El Patio", importe: 12500, medio: "Tarjeta débito", comp: true },
 ];
 
+function hoyDDMMYYYY() {
+  const d = new Date();
+  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+}
+
 const emptyForm = {
-  fecha: "", vendedor: "", vehiculo: "", categoria: CATEGORIAS[0], subcategoria: "",
+  fecha: hoyDDMMYYYY(), vendedor: "", vehiculo: "", categoria: CATEGORIAS[0], subcategoria: "",
   proveedor: "", importe: "", medio: MEDIOS_PAGO[0], observaciones: "",
 };
 
@@ -98,6 +103,7 @@ export default function CargaGastos() {
   const [editId, setEditId] = useState(null);
   const [periodosArchivados, setPeriodosArchivados] = useState([]);
   const [confirmarCierre, setConfirmarCierre] = useState(false);
+  const [errorGuardado, setErrorGuardado] = useState("");
 
   function cerrarPeriodo() {
     const etiqueta = `Período cerrado el ${new Date().toLocaleDateString("es-AR")}`;
@@ -115,7 +121,15 @@ export default function CargaGastos() {
   }
 
   function guardarGasto() {
-    if (!form.fecha || !form.importe || !form.proveedor) return;
+    const faltantes = [];
+    if (!form.fecha) faltantes.push("Fecha");
+    if (!form.importe) faltantes.push("Importe");
+    if (!form.proveedor) faltantes.push("Proveedor");
+    if (faltantes.length > 0) {
+      setErrorGuardado(`Completá estos campos antes de guardar: ${faltantes.join(", ")}.`);
+      return;
+    }
+    setErrorGuardado("");
     if (editId) {
       setGastos(gastos.map((g) => (g.id === editId ? { ...g, ...form, importe: Number(form.importe), comp: !!comprobante || g.comp } : g)));
     } else {
@@ -194,6 +208,12 @@ export default function CargaGastos() {
               <Field label="Medio de pago" value={form.medio} onChange={(v) => setF("medio", v)} as="select" options={MEDIOS_PAGO} full />
               <Field label="Observaciones" value={form.observaciones} onChange={(v) => setF("observaciones", v)} as="textarea" full />
             </div>
+
+            {errorGuardado && (
+              <div style={{ ...cs.infoStrip, background: T.dangerSoft, color: T.danger, marginBottom: 0 }}>
+                {errorGuardado}
+              </div>
+            )}
 
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 4 }}>
               {editId && (
