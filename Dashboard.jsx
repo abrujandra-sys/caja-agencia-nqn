@@ -7,8 +7,8 @@ import {
   Fuel, ChevronDown, Users, AlertTriangle, Paperclip, Wrench, ShieldCheck,
   Percent, Upload, PlusCircle,
 } from "lucide-react";
-import { T, fmt } from "../tokens";
-import { cs, SectionTitle } from "../common.jsx";
+import { T, fmt } from "./tokens";
+import { cs, SectionTitle } from "./common.jsx";
 
 const CATEGORIAS = [
   { name: "Combustible", value: 412500, color: T.primary },
