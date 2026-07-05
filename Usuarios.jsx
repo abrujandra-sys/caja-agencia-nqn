@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import {
   ShieldCheck, ShieldAlert, Plus, History, Pencil, KeyRound, Search, Check, RefreshCw,
 } from "lucide-react";
-import { T } from "../tokens";
-import { cs, SectionTitle, Field, Modal } from "../common.jsx";
+import { T } from "./tokens";
+import { cs, SectionTitle, Field, Modal } from "./common.jsx";
 
 const USUARIOS_INICIAL = [
   { id: 1, usuario: "admin", nombre: "A. Marchetti", perfil: "Administrador", ultimo: "04/07/2026 · 09:12", estado: "activo" },
