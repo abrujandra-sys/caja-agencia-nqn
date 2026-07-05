@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { LogOut, LayoutDashboard, PlusCircle, Users as UsersIcon, Search, Bell } from "lucide-react";
 import { T } from "./tokens";
-import Login from "./screens/Login.jsx";
-import Dashboard from "./screens/Dashboard.jsx";
-import CargaGastos from "./screens/CargaGastos.jsx";
-import Usuarios from "./screens/Usuarios.jsx";
+import Login from "./Login.jsx";
+import Dashboard from "./Dashboard.jsx";
+import CargaGastos from "./CargaGastos.jsx";
+import Usuarios from "./Usuarios.jsx";
 
 const ALERTAS_COUNT = 3;
 
