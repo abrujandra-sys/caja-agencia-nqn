@@ -2,8 +2,8 @@ import React, { useRef, useState } from "react";
 import {
   Upload, FileText, Check, Search, Paperclip, Pencil, Trash2, PlusCircle,
 } from "lucide-react";
-import { T, fmt } from "../tokens";
-import { cs, SectionTitle, Field } from "../common.jsx";
+import { T, fmt } from "./tokens";
+import { cs, SectionTitle, Field } from "./common.jsx";
 
 const CATEGORIAS = ["Combustible", "Repuestos", "Service", "Publicidad", "Peajes", "Viáticos", "Mantenimiento", "Herramientas", "Seguros", "Librería", "Supermercado", "Comisiones", "Otros"];
 const MEDIOS_PAGO = ["Efectivo", "Transferencia", "Tarjeta débito", "Tarjeta crédito", "Cuenta corriente"];
